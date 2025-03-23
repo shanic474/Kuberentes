@@ -1,0 +1,29 @@
+apiVersion: apps/v1  # Defines the Kubernetes API version for Deployments.
+kind: Deployment  # We are creating a Deployment (manages multiple Pods).
+metadata:
+  name: nginx-deployment  # The name of the Deployment (used inside the cluster).
+  labels:
+    app: nginx  # A label to identify this Deployment.
+spec:
+  replicas: 2  # This tells Kubernetes to run 2 copies (replicas) of the Pod.
+  selector:  # Defines which Pods the Deployment will manage.
+    matchLabels:
+      app: nginx  # This must match the label inside 'template.metadata.labels'.
+  template:  # Defines how each Pod should be created.
+    metadata:
+      labels:
+        app: nginx  # This label must match the selector above.
+    spec:
+      containers:  # The list of containers running inside each Pod.
+      - name: nginx  # The name of the container.
+        image: nginx  # The official Nginx image from Docker Hub.
+        ports:
+        - containerPort: 80  # The port Nginx listens on INSIDE the container.
+        volumeMounts:  # This mounts external storage inside the container.
+        - name: config-volume  # Must match the volume name below.
+          mountPath: /usr/share/nginx/html  # This replaces Nginx's default webpage.
+
+      volumes:  # Defines the external storage that will be mounted inside the container.
+      - name: config-volume  # This name must match the one in 'volumeMounts'.
+        configMap:  # We are using a ConfigMap as a volume.
+          name: nginx-config  # This must match the name of the ConfigMap.
